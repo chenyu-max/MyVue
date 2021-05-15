@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>MyVue——DUE</title>
+    </head>
+    <body>
+        <div id="test">
+            你好{{content}}
+            <br>
+            <span>{{description}}</span>
+        </div>
+        <script type="module">
+            import Due from "./core/index.js";
+
+            window.test = new Due({
+                el: 'test',
+                data: {
+                    content: 'LeoYu',
+                    description: 'hello LeoYu',
+                }
+            });
+        </script>
+    </body>
+</html>
