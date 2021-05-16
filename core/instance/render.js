@@ -26,6 +26,16 @@ export function renderNode(vm, vNode) {
             // 文本节点直接进行 nodeValue 的 赋值
             vNode.elm.nodeValue = result;
         }
+    } else if (vNode.nodeType === 1 && vNode.tag === 'INPUT') {
+        let templates = vNode2Template.get(vNode);
+        if (templates) {
+            for (let i = 0; i < templates.length; i++) {
+                let templateValue = getTemplateValue([vm._data, vNode.env], templates[i]);
+                if (templateValue) {
+                    vNode.elm.value = templateValue;
+                }
+            }
+        }
     } else {
         for (let i = 0; i < vNode.children.length; i++) {
             renderNode(vm, vNode.children[i]);
@@ -41,6 +51,7 @@ export function prepareRender(vm, vNode) {
         // 是个文本节点
         analysisTemplateString(vNode);
     }
+    analysisAttr(vm, vNode);
     if (vNode.nodeType === 1) {
         // 元素节点
         for (let i = 0; i < vNode.children.length; i++) {
@@ -133,4 +144,20 @@ function getTemplateValue(obj, templateName) {
         }
     }
     return null;
+}
+
+/**
+ * 分析属性
+ * @param vm
+ * @param vNode
+ */
+function analysisAttr(vm, vNode) {
+    if (vNode.nodeType !== 1) {
+        return;
+    }
+    let attrNames = vNode.elm.getAttributeNames();
+    if (attrNames.indexOf('v-model') > -1) {
+        setTemplate2VNode(vNode.elm.getAttribute('v-model'), vNode);
+        setVNode2Template(vNode.elm.getAttribute('v-model'), vNode);
+    }
 }
