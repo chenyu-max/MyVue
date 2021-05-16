@@ -1,8 +1,37 @@
+import {getValue} from "../util/ObjectUtil.js";
 // 通过模板来找到哪些节点用到了这个模板
 let template2VNode = new Map();
 
 // 通过节点，找到这个节点下有哪些模板
 let vNode2Template = new Map();
+
+export function renderMixin(Due) {
+    Due.prototype._render = function () {
+        renderNode(this, this._vnode);
+    }
+}
+
+export function renderNode(vm, vNode) {
+    if (vNode.nodeType === 3) {
+        // 是个文本节点
+        let templates = vNode2Template.get(vNode);
+        if (templates) {
+            let result = vNode.text;
+            for (let i = 0; i < templates.length; i++) {
+                let templateValue = getTemplateValue([vm._data, vNode.env], templates[i]); // 当前节点的参数 可以来自于Due 对象，也可以来自于父级节点
+                if (templateValue) {
+                    result = result.replace('{{' + templates[i] + '}}', templateValue);
+                }
+            }
+            // 文本节点直接进行 nodeValue 的 赋值
+            vNode.elm.nodeValue = result;
+        }
+    } else {
+        for (let i = 0; i < vNode.children.length; i++) {
+            renderNode(vm, vNode.children[i]);
+        }
+    }
+}
 
 export function prepareRender(vm, vNode) {
     if (vNode === null) {
@@ -74,4 +103,20 @@ function getTemplateName(template) {
         return template;
     }
 
+}
+
+/**
+ * 获取 双花括号 中 表达式的 值
+ * @param obj
+ * @param templateName
+ * @returns {null|*}
+ */
+function getTemplateValue(obj, templateName) {
+    for (let i = 0; i < obj.length; i++) {
+        let temp = getValue(obj[i], templateName);
+        if (temp != null) {
+            return temp;
+        }
+    }
+    return null;
 }
