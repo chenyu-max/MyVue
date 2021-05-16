@@ -1,3 +1,5 @@
+import {renderData} from "./render.js";
+
 /**
  * 我们要知道哪个属性被修改了，才能对页面上的内容进行更新
  * 我们必须先能够捕获修改的事件
@@ -51,6 +53,7 @@ function constructorObjectProxy(vm, obj, namespace) {
                 },
                 set(value) {
                     obj[prop] = value;
+                    renderData(vm, getNameSpace(namespace, prop));
                 }
             });
             Object.defineProperty(vm, prop, {
@@ -59,8 +62,8 @@ function constructorObjectProxy(vm, obj, namespace) {
                     return obj[prop];
                 },
                 set(value) {
-                    console.log(getNameSpace(namespace, prop));
                     obj[prop] = value;
+                    renderData(vm, getNameSpace(namespace, prop));
                 }
             })
             if (obj[prop] instanceof Object) {
@@ -88,7 +91,7 @@ function defArrayFunc(obj, func, namespace, vm) {
         value: function (...args) {
             let original = arrayProto[func];
             const result = original.apply(this, args);
-            console.log(getNameSpace(namespace, ""));
+            renderData(vm, getNameSpace(namespace, ""));
             return result;
         },
     })

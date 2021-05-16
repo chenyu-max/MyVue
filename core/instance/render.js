@@ -50,6 +50,20 @@ export function prepareRender(vm, vNode) {
 }
 
 /**
+ * 数据变化的时候，重现调用下渲染函数，使页面中相应的数据进行变化
+ * @param vm
+ * @param data
+ */
+export function renderData(vm, data) {
+    let vNodes = template2VNode.get(data);
+    if (vNodes != null) {
+        for (let i = 0; i < vNodes.length; i++) {
+            renderNode(vm, vNodes[i]);
+        }
+    }
+}
+
+/**
  * 对文本节点的文本进行模板分析
  * @param vNode
  */
