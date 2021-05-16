@@ -20,3 +20,23 @@ export function getValue(obj, name) {
     }
     return temp;
 }
+
+export function setValue(obj, attr, value) {
+    if (!obj) {
+        return obj;
+    }
+    let attrList = attr.split(".");
+    let temp = obj;
+    // 只循环到倒数第二层
+    for (let i = 0; i < attrList.length - 1; i++) {
+        if (temp[attrList[i]]) {
+            temp = temp[attrList[i]];
+        } else {
+            return;
+        }
+    }
+    // 此时的 temp 已经到达了倒数第二层
+    if (temp[attrList[attrList.length - 1]] != null) {
+        temp[attrList[attrList.length - 1]] = value;
+    }
+}

@@ -1,5 +1,6 @@
 import VNode from "../vdom/vnode.js";
 import {prepareRender} from "./render.js";
+import {vmodel} from "./grammar/vmodel.js";
 
 export function initMount(Due) {
     Due.prototype.$mount = function (el) {
@@ -17,6 +18,7 @@ export function mount(vm, elm) {
 }
 
 function constructorVNode(vm, elm, parent) {
+    analysisAttr(vm, elm, parent);
     let vNode = null;
     let children = [];
     let text = getNodeText(elm);
@@ -44,5 +46,21 @@ function getNodeText(elm) {
         return elm.nodeValue;
     } else {
         return '';
+    }
+}
+
+/**
+ * 分析属性
+ * @param vm
+ * @param elm
+ * @param parent
+ */
+function analysisAttr(vm, elm, parent) {
+    if (elm.nodeType === 1) {
+        let attrNames = elm.getAttributeNames();
+        if (attrNames.indexOf('v-model') > -1) {
+            console.log(vm, elm, elm.getAttribute('v-model'));
+            vmodel(vm, elm, elm.getAttribute('v-model'));
+        }
     }
 }

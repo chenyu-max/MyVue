@@ -7,9 +7,12 @@
     <body>
         <div id="test">
             你好{{content}},{{description}}
-            <br/>
-            <span>{{description}}</span><br/>
-            {{obj.x}}<br/>
+            <br>
+            <span>{{description}}</span>
+            <label>
+                <input type="text" v-model="obj.x">
+            </label>
+            {{obj.x}}
         </div>
         <script type="module">
             import Due from "./core/index.js";
