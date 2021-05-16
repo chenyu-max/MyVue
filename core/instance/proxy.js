@@ -10,7 +10,11 @@ export function constructorProxy(vm, obj, namespace) {
     // 递归
     let proxyObj = null;
     if (obj instanceof Array) { // 判断这个对象是否位数组
-
+        proxyObj = new Array(obj.length);
+        for (let i = 0; i < obj.length; i++) {
+            proxyObj[i] = constructorProxy(vm, obj[i], namespace);
+        }
+        proxyObj = proxyArr(vm, obj, namespace);
     } else if (obj instanceof Object) { // 判断这个对象是否位对象
         proxyObj = constructorObjectProxy(vm, obj, namespace);
     } else {
@@ -19,6 +23,12 @@ export function constructorProxy(vm, obj, namespace) {
     return proxyObj;
 }
 
+/**
+ * 获得当前需要代理的对象的 namespace
+ * @param nowNameSpace  现在的namespace
+ * @param nowProp       现在的属性
+ * @returns {string|*}  返回新的namespace
+ */
 function getNameSpace(nowNameSpace, nowProp) {
     if (nowNameSpace === '' || nowNameSpace === null) {
         return nowProp;
@@ -59,4 +69,61 @@ function constructorObjectProxy(vm, obj, namespace) {
         }
     }
     return proxyObj;
+}
+
+// 将 Array 的 prototype 取出
+const arrayProto = Array.prototype;
+
+/**
+ * 对 数组的函数操作进行代理
+ * @param obj       代理到哪个对象身上
+ * @param func      哪个函数需要代理
+ * @param namespace
+ * @param vm
+ */
+function defArrayFunc(obj, func, namespace, vm) {
+    Object.defineProperty(obj, func, {
+        enumerable: true,
+        configurable: true,
+        value: function (...args) {
+            let original = arrayProto[func];
+            const result = original.apply(this, args);
+            console.log(getNameSpace(namespace, ""));
+            return result;
+        },
+    })
+}
+
+/**
+ * 对数组进行代理操作
+ * @param vm        vm对象
+ * @param arr       需要代理的数组
+ * @param namespace
+ * @returns {*}
+ */
+function proxyArr(vm, arr, namespace) {
+    let obj = {
+        eleType: 'Array',
+        toString: function () {
+            let result = '';
+            for (let i = 0; i < arr.length; i++) {
+                result += arr[i] + ", ";
+            }
+            return result.substring(0, result.length - 2); // -2 是把逗号和空格去掉
+        },
+        push() {
+        },
+        pop() {
+        },
+        shift() {
+        },
+        unshift() {
+        },
+    };
+    defArrayFunc.call(vm, obj, 'push', namespace, vm);
+    defArrayFunc.call(vm, obj, 'pop', namespace, vm);
+    defArrayFunc.call(vm, obj, 'shift', namespace, vm);
+    defArrayFunc.call(vm, obj, 'unshift', namespace, vm);
+    arr.__proto__ = obj;
+    return arr;
 }
