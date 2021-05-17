@@ -1,4 +1,5 @@
 import {renderData} from "./render.js";
+import {rebuild} from "./mount.js";
 
 /**
  * 我们要知道哪个属性被修改了，才能对页面上的内容进行更新
@@ -91,6 +92,7 @@ function defArrayFunc(obj, func, namespace, vm) {
         value: function (...args) {
             let original = arrayProto[func];
             const result = original.apply(this, args);
+            rebuild(vm, getNameSpace(namespace, ""));
             renderData(vm, getNameSpace(namespace, ""));
             return result;
         },

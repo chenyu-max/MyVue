@@ -51,12 +51,14 @@ export function prepareRender(vm, vNode) {
         // 是个文本节点
         analysisTemplateString(vNode);
     }
+    if (vNode.nodeType === 0) {
+        // 虚拟节点
+        setTemplate2VNode("{{" + vNode.data + "}}", vNode);
+        setVNode2Template("{{" + vNode.data + "}}", vNode);
+    }
     analysisAttr(vm, vNode);
-    if (vNode.nodeType === 1) {
-        // 元素节点
-        for (let i = 0; i < vNode.children.length; i++) {
-            prepareRender(vm, vNode.children[i]);
-        }
+    for (let i = 0; i < vNode.children.length; i++) {
+        prepareRender(vm, vNode.children[i]);
     }
 }
 
@@ -72,6 +74,20 @@ export function renderData(vm, data) {
             renderNode(vm, vNodes[i]);
         }
     }
+}
+
+/**
+ * 通过 模板 获得节点
+ * @param template
+ * @returns {any}
+ */
+export function getVNodeByTemplate(template) {
+    return template2VNode.get(template);
+}
+
+export function clearMap() {
+    template2VNode.clear();
+    vNode2Template.clear();
 }
 
 /**

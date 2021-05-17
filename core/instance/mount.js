@@ -1,5 +1,5 @@
 import VNode from "../vdom/vnode.js";
-import {prepareRender} from "./render.js";
+import {prepareRender, getVNodeByTemplate, clearMap} from "./render.js";
 import {vmodel} from "./grammar/vmodel.js";
 import {vforInit} from "./grammar/vfor.js";
 import {mergeAttr} from "../util/ObjectUtil.js";
@@ -19,6 +19,19 @@ export function mount(vm, elm) {
     prepareRender(vm, vm._vnode);
 }
 
+export function rebuild(vm, template) {
+    let virtualNode = getVNodeByTemplate(template);
+    for (let i = 0; i < virtualNode.length; i++) {
+        virtualNode[i].parent.elm.innerHTML = '';
+        // 将模板还原，方便之后的重新编译渲染
+        virtualNode[i].parent.elm.appendChild(virtualNode[i].elm);
+        let result = constructorVNode(vm, virtualNode[i].elm, virtualNode[i].parent);
+        virtualNode[i].parent.children = [result];
+        clearMap();
+        prepareRender(vm, vm._vnode);
+    }
+}
+
 function constructorVNode(vm, elm, parent) {
     let vNode = analysisAttr(vm, elm, parent);
     if (vNode == null) {
@@ -34,9 +47,10 @@ function constructorVNode(vm, elm, parent) {
             vNode.env = mergeAttr(vNode.env, parent ? parent.env : {});
         }
     }
-    let childrenArr = vNode.elm.childNodes;
-    // 深度优鲜搜索
-    for (let i = 0; i < childrenArr.length; i++) {
+    let childrenArr = vNode.nodeType === 0 ? vNode.parent.elm.childNodes : vNode.elm.childNodes;
+    let len = vNode.nodeType === 0 ? vNode.parent.elm.childNodes.length : vNode.elm.childNodes.length;
+    // 深度优先搜索
+    for (let i = 0; i < len; i++) {
         // 进行递归搜索
         let childNodes = constructorVNode(vm, childrenArr[i], vNode);
         if (childNodes instanceof VNode) { // 返回单一节点的时候

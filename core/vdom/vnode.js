@@ -1,3 +1,4 @@
+let number = 0;
 export default class VNode {
     /**
      * VNode构造函数
@@ -20,6 +21,7 @@ export default class VNode {
         this.env = {};              // 当前节点的环境变量
         this.instructions = null;   // 存放指令
         this.template = [];         // 当前节点涉及到的模板
+        this.number = number++;
     }
-    
+
 }
