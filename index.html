@@ -19,6 +19,7 @@
                     年龄{{key.b}}
                 </li>
             </ul>
+            <img v-bind:src="imgSrc"/>
         </div>
         <script type="module">
             import Due from "./core/index.js";
@@ -35,7 +36,8 @@
                     list: [
                         {a: 'LeoYu', b: 20},
                         {a: 'monkey', b: 22}
-                    ]
+                    ],
+                    imgSrc: "./a.png",
                 }
             });
         </script>
