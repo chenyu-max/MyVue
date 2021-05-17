@@ -4,6 +4,7 @@ import {vmodel} from "./grammar/vmodel.js";
 import {vforInit} from "./grammar/vfor.js";
 import {mergeAttr} from "../util/ObjectUtil.js";
 import {checkVBind} from "./grammar/vbind.js";
+import {checkVOn} from "./grammar/von.js";
 
 export function initMount(Due) {
     Due.prototype.$mount = function (el) {
@@ -49,6 +50,7 @@ function constructorVNode(vm, elm, parent) {
         }
     }
     checkVBind(vm, vNode);
+    checkVOn(vm, vNode);
     let childrenArr = vNode.nodeType === 0 ? vNode.parent.elm.childNodes : vNode.elm.childNodes;
     let len = vNode.nodeType === 0 ? vNode.parent.elm.childNodes.length : vNode.elm.childNodes.length;
     // 深度优先搜索

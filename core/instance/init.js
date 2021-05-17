@@ -14,6 +14,12 @@ export function initMixin(Due) {
         // 初始化数据 Data
         // 初始化 create 方法
         // 初始化 methods
+        if (options && options.methods) {
+            vm._methods = options.methods;
+            for (let temp in options.methods) {
+                vm[temp] = options.methods[temp];
+            }
+        }
         // 初始化 computed
         // 初始化 el 并挂载
         if (options && options.el) {

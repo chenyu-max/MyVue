@@ -19,7 +19,7 @@
             <br>
             <span>{{description}}</span>
             <label>
-                <input type="text" v-model="obj.x">
+                <input type="text" v-model="obj.x" v-on:keydown="enter">
             </label>
             {{obj.x}}
             <ul>
@@ -52,6 +52,11 @@
                     ],
                     imgSrc: "./a.png",
                     redClass: 'red',
+                },
+                methods: {
+                    enter: function () {
+                        console.log('hello');
+                    }
                 }
             });
         </script>
