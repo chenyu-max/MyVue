@@ -1,6 +1,8 @@
 import VNode from "../vdom/vnode.js";
 import {prepareRender} from "./render.js";
 import {vmodel} from "./grammar/vmodel.js";
+import {vforInit} from "./grammar/vfor.js";
+import {mergeAttr} from "../util/ObjectUtil.js";
 
 export function initMount(Due) {
     Due.prototype.$mount = function (el) {
@@ -18,14 +20,20 @@ export function mount(vm, elm) {
 }
 
 function constructorVNode(vm, elm, parent) {
-    analysisAttr(vm, elm, parent);
-    let vNode = null;
-    let children = [];
-    let text = getNodeText(elm);
-    let data = null;
-    let nodeType = elm.nodeType;
-    let tag = elm.nodeName;
-    vNode = new VNode(tag, elm, children, text, data, parent, nodeType);
+    let vNode = analysisAttr(vm, elm, parent);
+    if (vNode == null) {
+        let children = [];
+        let text = getNodeText(elm);
+        let data = null;
+        let nodeType = elm.nodeType;
+        let tag = elm.nodeName;
+        vNode = new VNode(tag, elm, children, text, data, parent, nodeType);
+        if (elm.nodeType === 1 && elm.getAttribute('env')) {
+            vNode.env = mergeAttr(vNode.env, JSON.parse(elm.getAttribute('env')));
+        } else {
+            vNode.env = mergeAttr(vNode.env, parent ? parent.env : {});
+        }
+    }
     let childrenArr = vNode.elm.childNodes;
     // 深度优鲜搜索
     for (let i = 0; i < childrenArr.length; i++) {
@@ -40,8 +48,12 @@ function constructorVNode(vm, elm, parent) {
     return vNode;
 }
 
+/**
+ * 如果是文本节点，返回文本内容
+ * @param elm
+ * @returns {string|any}
+ */
 function getNodeText(elm) {
-    // 如果是文本节点，返回文本内容
     if (elm.nodeType === 3) {
         return elm.nodeValue;
     } else {
@@ -60,6 +72,9 @@ function analysisAttr(vm, elm, parent) {
         let attrNames = elm.getAttributeNames();
         if (attrNames.indexOf('v-model') > -1) {
             vmodel(vm, elm, elm.getAttribute('v-model'));
+        }
+        if (attrNames.indexOf('v-for') > -1) {
+            return vforInit(vm, elm, parent, elm.getAttribute('v-for'));
         }
     }
 }

@@ -13,6 +13,12 @@
                 <input type="text" v-model="obj.x">
             </label>
             {{obj.x}}
+            <ul>
+                <li v-for="(key) in list">
+                    姓名{{key.a}}
+                    年龄{{key.b}}
+                </li>
+            </ul>
         </div>
         <script type="module">
             import Due from "./core/index.js";
