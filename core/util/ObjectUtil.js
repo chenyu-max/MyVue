@@ -105,3 +105,9 @@ function easyClone(obj) {
     // 这种方法有局限性，无法合并代理对象  比如 vm._data
     return JSON.parse(JSON.stringify(obj));
 }
+
+export function getEnvAttr(vm, vNode) {
+    let result = mergeAttr(vm._data, vNode.env);
+    result = mergeAttr(result, vm._computed);
+    return result;
+}
