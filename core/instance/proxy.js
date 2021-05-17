@@ -1,5 +1,6 @@
 import {renderData} from "./render.js";
 import {rebuild} from "./mount.js";
+import {getValue} from "../util/ObjectUtil.js";
 
 /**
  * 我们要知道哪个属性被修改了，才能对页面上的内容进行更新
@@ -64,7 +65,14 @@ function constructorObjectProxy(vm, obj, namespace) {
                 },
                 set(value) {
                     obj[prop] = value;
-                    renderData(vm, getNameSpace(namespace, prop));
+                    let val = getValue(vm._data, getNameSpace(namespace, prop));
+                    if (val instanceof Array) {
+                        rebuild(vm, getNameSpace(namespace, prop));
+                        renderData(vm, getNameSpace(namespace, prop));
+                    } else {
+                        renderData(vm, getNameSpace(namespace, prop));
+                    }
+
                 }
             })
             if (obj[prop] instanceof Object) {
