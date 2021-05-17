@@ -48,10 +48,10 @@ export function setValue(obj, attr, value) {
  * @returns {*[]|*|{}|{}}
  */
 export function mergeAttr(obj1, obj2) {
-    if (obj1 === null) {
+    if (obj1 === null || obj1 === undefined) {
         return clone(obj2);
     }
-    if (obj2 === null) {
+    if (obj2 === null || obj2 === undefined) {
         return clone(obj1);
     }
     let result = {};
